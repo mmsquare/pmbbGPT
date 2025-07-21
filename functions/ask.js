@@ -1,9 +1,7 @@
-import json
-import os
-import requests
+const axios = require('axios');
 
-# Training data for few-shot learning
-TRAINING_DATA = [
+// Training data for few-shot learning
+const TRAINING_DATA = [
     {
         "input": "How should I prioritize these features when everything feels urgent?",
         "output": "Prioritization is only possible when project's goal and target audience are clearly defined. e.g. if the project's first milestone's goal is to validate whether users find beauty product review content useful, we should focus our energy on curating list of most useful content we can find and show users directly. Meanwhile, we should skip features such as login, account creation and likes."
@@ -24,108 +22,115 @@ TRAINING_DATA = [
         "input": "We're in a crowded market. How do we differentiate our product strategy?",
         "output": "a good strategy is where we do things that we are unique position to do well that is impossible or dificult to be picked up by competitors. If we already have initial tractions, I'll ask ourselves what makes our product unique that user chooses us over competitors and double-down on that. If we do not yet have initial user base, i'll think about a few hypothesis that if we do well, we will provide a unique value to the users that our team has strength to do well and maintain."
     }
-]
+];
 
-def create_few_shot_prompt(user_question, max_examples=3):
-    """Create a few-shot prompt with training examples"""
-    prompt = "You are a product management expert. Here are some examples of how to answer questions:\n\n"
+function createFewShotPrompt(userQuestion, maxExamples = 3) {
+    let prompt = "You are a product management expert. Here are some examples of how to answer questions:\n\n";
 
-    for i, example in enumerate(TRAINING_DATA[:max_examples]):
-        prompt += f"Question: {example['input']}\n"
-        prompt += f"Answer: {example['output']}\n\n"
-
-    prompt += f"Now answer this question:\nQuestion: {user_question}\nAnswer:"
-    return prompt
-
-def query_model(question):
-    """Query the Fireworks AI model"""
-    api_key = os.getenv('FIREWORKS_API_KEY')
-    model_id = "accounts/fireworks/models/llama-v3p1-70b-instruct"
-    
-    if not api_key:
-        return "Error: FIREWORKS_API_KEY not found in environment variables"
-    
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+    for (let i = 0; i < Math.min(maxExamples, TRAINING_DATA.length); i++) {
+        const example = TRAINING_DATA[i];
+        prompt += `Question: ${example.input}\n`;
+        prompt += `Answer: ${example.output}\n\n`;
     }
 
-    # Create few-shot prompt
-    prompt = create_few_shot_prompt(question)
+    prompt += `Now answer this question:\nQuestion: ${userQuestion}\nAnswer:`;
+    return prompt;
+}
 
-    data = {
-        "model": model_id,
+async function queryModel(question) {
+    const apiKey = process.env.FIREWORKS_API_KEY;
+    const modelId = "accounts/fireworks/models/llama-v3p1-70b-instruct";
+    
+    if (!apiKey) {
+        return "Error: FIREWORKS_API_KEY not found in environment variables";
+    }
+    
+    const headers = {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+    };
+
+    // Create few-shot prompt
+    const prompt = createFewShotPrompt(question);
+
+    const data = {
+        "model": modelId,
         "messages": [
             {"role": "user", "content": prompt}
         ],
         "max_tokens": 500,
         "temperature": 0.7
-    }
+    };
 
-    try:
-        response = requests.post(
+    try {
+        const response = await axios.post(
             "https://api.fireworks.ai/inference/v1/chat/completions",
-            headers=headers,
-            json=data
-        )
+            data,
+            { headers }
+        );
 
-        if response.status_code == 200:
-            result = response.json()
-            return result['choices'][0]['message']['content']
-        else:
-            return f"Error: {response.status_code} - {response.text}"
+        return response.data.choices[0].message.content;
+    } catch (error) {
+        if (error.response) {
+            return `Error: ${error.response.status} - ${error.response.data}`;
+        } else {
+            return `Error: ${error.message}`;
+        }
+    }
+}
 
-    except Exception as e:
-        return f"Error: {e}"
-
-def handler(event, context):
-    """Netlify function handler"""
-    # Handle CORS
-    headers = {
+exports.handler = async function(event, context) {
+    // Handle CORS
+    const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    };
+    
+    // Handle preflight requests
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers,
+            body: ''
+        };
     }
     
-    # Handle preflight requests
-    if event['httpMethod'] == 'OPTIONS':
+    if (event.httpMethod !== 'POST') {
         return {
-            'statusCode': 200,
-            'headers': headers,
-            'body': ''
-        }
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({error: 'Method not allowed'})
+        };
+    }
     
-    if event['httpMethod'] != 'POST':
-        return {
-            'statusCode': 405,
-            'headers': headers,
-            'body': json.dumps({'error': 'Method not allowed'})
-        }
-    
-    try:
-        # Parse request body
-        body = json.loads(event['body'])
-        question = body.get('question', '')
+    try {
+        // Parse request body
+        const body = JSON.parse(event.body);
+        const question = body.question || '';
         
-        if not question:
+        if (!question) {
             return {
-                'statusCode': 400,
-                'headers': headers,
-                'body': json.dumps({'error': 'No question provided'})
-            }
-        
-        # Get AI response
-        answer = query_model(question)
-        
-        return {
-            'statusCode': 200,
-            'headers': headers,
-            'body': json.dumps({'answer': answer})
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({error: 'No question provided'})
+            };
         }
         
-    except Exception as e:
+        // Get AI response
+        const answer = await queryModel(question);
+        
         return {
-            'statusCode': 500,
-            'headers': headers,
-            'body': json.dumps({'error': str(e)})
-        } 
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({answer})
+        };
+        
+    } catch (error) {
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({error: error.message})
+        };
+    }
+}; 
