@@ -8,6 +8,17 @@ A chat-based AI assistant for product management questions, powered by Fireworks
 - 💬 Chat-like interface
 - 📚 Few-shot learning with custom training data
 - 🌐 Deployed on Netlify
+- 🔒 Client-side API calls (your API key stays private)
+
+## Live Demo
+
+**🌐 Live Site**: https://fascinating-moonbeam-d04d88.netlify.app
+
+## How to Use
+
+1. **Visit the site** and enter your Fireworks AI API key
+2. **Ask questions** about product management
+3. **Get AI-powered advice** based on expert examples
 
 ## Local Development
 
@@ -33,7 +44,7 @@ python web_app.py
 
 ### Prerequisites
 - Netlify account
-- FIREWORKS_API_KEY environment variable
+- FIREWORKS_API_KEY (entered by users in the browser)
 
 ### Deployment Steps
 
@@ -53,23 +64,24 @@ netlify init
 netlify deploy --prod
 ```
 
-4. **Set environment variables** in Netlify dashboard:
-   - Go to Site settings > Environment variables
-   - Add `FIREWORKS_API_KEY` with your API key
-
-### Project Structure for Netlify
+### Project Structure
 
 ```
 pmbbGPT/
-├── public/              # Static files
-│   └── index.html      # Frontend
-├── functions/           # Serverless functions
-│   ├── ask.py          # AI API handler
-│   ├── requirements.txt # Python dependencies
-│   └── data.JSONL      # Training data
+├── public/
+│   └── index.html      # Frontend (chat interface + API calls)
+├── templates/
+│   └── index.html      # Flask template (for local development)
 ├── netlify.toml        # Netlify configuration
-└── requirements.txt    # Root dependencies
+├── web_app.py          # Flask app (for local development)
+└── README.md           # Documentation
 ```
+
+## Security & Privacy
+
+- **API Key Security**: Your Fireworks AI API key is stored locally in your browser and never sent to our servers
+- **Client-side Processing**: All API calls are made directly from your browser to Fireworks AI
+- **No Server Storage**: We don't store any of your conversations or API keys
 
 ## API Usage
 
@@ -84,6 +96,10 @@ The AI assistant uses few-shot learning with 5 product management examples:
 ## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Netlify Functions (Python)
 - **AI**: Fireworks AI LLaMA 3.1 70B
-- **Deployment**: Netlify 
+- **Deployment**: Netlify (Static Site)
+- **Local Development**: Flask
+
+## GitHub Repository
+
+**📁 Source Code**: https://github.com/mmsquare/pmbbGPT 
