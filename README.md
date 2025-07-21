@@ -73,15 +73,18 @@ netlify deploy --prod
 ```
 pmbbGPT/
 ├── public/
-│   └── index.html      # Frontend (chat interface)
+│   └── index.html          # Frontend (chat interface)
 ├── functions/
-│   ├── ask.js          # Serverless function (AI API)
-│   └── package.json    # Function dependencies
+│   ├── ask.js              # Serverless function (AI API)
+│   ├── training-data.js    # Training data (JS module)
+│   ├── training-data.json  # Training data (JSON format)
+│   └── package.json        # Function dependencies
 ├── templates/
-│   └── index.html      # Flask template (for local development)
-├── netlify.toml        # Netlify configuration
-├── web_app.py          # Flask app (for local development)
-└── README.md           # Documentation
+│   └── index.html          # Flask template (for local development)
+├── update-training-data.js # Utility to manage training data
+├── netlify.toml            # Netlify configuration
+├── web_app.py              # Flask app (for local development)
+└── README.md               # Documentation
 ```
 
 ## Security & Privacy
@@ -90,12 +93,29 @@ pmbbGPT/
 - **No client-side exposure**: API key never leaves the server
 - **User-friendly**: No setup required for end users
 
-## API Usage
+## Training Data Management
 
-The AI assistant uses few-shot learning with 5 product management examples:
+The AI assistant uses few-shot learning with product management examples stored in separate files:
 
+### 📁 Training Data Files
+- **`functions/training-data.json`** - Easy-to-edit JSON format
+- **`functions/training-data.js`** - JavaScript module (auto-generated)
+
+### 🔧 Managing Training Data
+
+**Update training data:**
+```bash
+node update-training-data.js
+```
+
+**Add new example:**
+```bash
+node update-training-data.js add "Your question here?" "Your answer here."
+```
+
+### 📋 Current Examples
 1. Feature prioritization
-2. Product strategy definition
+2. Product strategy definition  
 3. Founder alignment with user needs
 4. Growth vs retention tradeoffs
 5. Market differentiation
