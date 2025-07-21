@@ -23,6 +23,28 @@
             text-align: center;
             margin-bottom: 30px;
         }
+        .model-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .api-key-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .api-key-section input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
         .chat-container {
             display: flex;
             flex-direction: column;
@@ -31,27 +53,27 @@
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
             background-color: #f8f9fa;
         }
-        
+
         .message {
             margin-bottom: 20px;
             display: flex;
         }
-        
+
         .user-message {
             justify-content: flex-end;
         }
-        
+
         .ai-message {
             justify-content: flex-start;
         }
-        
+
         .message-content {
             max-width: 70%;
             padding: 12px 16px;
@@ -59,30 +81,30 @@
             line-height: 1.5;
             word-wrap: break-word;
         }
-        
+
         .user-message .message-content {
             background-color: #007bff;
             color: white;
         }
-        
+
         .ai-message .message-content {
             background-color: white;
             color: #333;
             border: 1px solid #e9ecef;
         }
-        
+
         .input-section {
             padding: 20px;
             background-color: white;
             border-top: 1px solid #ddd;
         }
-        
+
         .input-container {
             display: flex;
             gap: 10px;
             align-items: flex-end;
         }
-        
+
         textarea {
             flex: 1;
             padding: 12px 16px;
@@ -94,12 +116,12 @@
             max-height: 100px;
             min-height: 44px;
         }
-        
+
         textarea:focus {
             outline: none;
             border-color: #007bff;
         }
-        
+
         button {
             background-color: #007bff;
             color: white;
@@ -111,23 +133,23 @@
             transition: background-color 0.3s;
             white-space: nowrap;
         }
-        
+
         button:hover {
             background-color: #0056b3;
         }
-        
+
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
-        
+
         .loading {
             text-align: center;
             color: #666;
             font-style: italic;
             padding: 20px;
         }
-        
+
         .error {
             color: #dc3545;
             background-color: #f8d7da;
@@ -136,35 +158,33 @@
             padding: 15px;
             margin: 10px 0;
         }
-        .model-info {
-            background-color: #e7f3ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🤖 Product Management AI Assistant</h1>
-        
+
         <div class="model-info">
             <strong>Model:</strong> LLaMA 3.1 70B (Fireworks AI)<br>
             <strong>Training Data:</strong> 5 product management examples<br>
             <strong>Approach:</strong> Few-shot learning
         </div>
 
+        <div class="api-key-section">
+            <strong>🔑 Fireworks AI API Key:</strong><br>
+            <input type="password" id="apiKey" placeholder="Enter your Fireworks AI API key here..." />
+            <small>Your API key is stored locally and never sent to our servers.</small>
+        </div>
+
         <div class="chat-container">
             <div id="chat-messages" class="chat-messages">
                 <div class="message ai-message">
                     <div class="message-content">
-                        👋 Hi! I'm your Product Management AI Assistant. Ask me anything about product strategy, feature prioritization, user research, or any other product management topics!
+                        👋 Hi! I'm your Product Management AI Assistant. Enter your Fireworks AI API key above, then ask me anything about product strategy, feature prioritization, user research, or any other product management topics!
                     </div>
                 </div>
             </div>
-            
+
             <div class="input-section">
                 <div class="input-container">
                     <textarea id="question" placeholder="Ask your product management question..." rows="2"></textarea>
@@ -175,46 +195,101 @@
     </div>
 
     <script>
+        // Training data for few-shot learning
+        const trainingData = [
+            {
+                "input": "How should I prioritize these features when everything feels urgent?",
+                "output": "Prioritization is only possible when project's goal and target audience are clearly defined. e.g. if the project's first milestone's goal is to validate whether users find beauty product review content useful, we should focus our energy on curating list of most useful content we can find and show users directly. Meanwhile, we should skip features such as login, account creation and likes."
+            },
+            {
+                "input": "What's the best way to define a product strategy for a new 0→1 product?",
+                "output": "a strategy is a statement of how we can win a target segment by poviding values that we are in a unique position to offer. Therefore, I would follow up with more questions: who's your target audience, what problem you are tryhing to solve, what unique value are you offering to solve the problem, is it defensible, how are you going to validate your value hypothesis quickly withtout even building a product"
+            },
+            {
+                "input": "The founder wants to build X, but it doesn't align with user needs. What should I do?",
+                "output": "Ask clarificaitons questions: what problem are you trying to solve by building this feature. If we solve the problem, what's the ideal outcome. If the feature really does not align with users' need, it's obvious that the problem we are solving is not the right one or the solution could be better. More often than not, there are founder/manager/boss who have some intuiation on what to build but not able to articulate very well the user problem, as a product person, instead of having a prolonged argument over opinions or semi-supported points, we should try to help them write down the best answers right now and validate with more evidence in the future. Writing them down help everyone on the team clear why we do something and validate once we have some results, validate and improve our decision making next time."
+            },
+            {
+                "input": "How do I make tradeoffs between growth and retention?",
+                "output": "Retention is usually meansurement of user experience and level of product-market-fit. Growth measures a product's market take-over speed and demonstrate real-world impact. Short answer is that, we should always care retention more than growth unless growth itself can bring a network effect that improves user experience and retention. In reality, it really depends on the situation the product is currently operating under. If the project has good-enough retention and also under pressure to take over market share, growth is prioritized; if retention is not good enough, we might need to improve the user experience and add user value or look for new growth channel to improe user retention before growing."
+            },
+            {
+                "input": "We're in a crowded market. How do we differentiate our product strategy?",
+                "output": "a good strategy is where we do things that we are unique position to do well that is impossible or dificult to be picked up by competitors. If we already have initial tractions, I'll ask ourselves what makes our product unique that user chooses us over competitors and double-down on that. If we do not yet have initial user base, i'll think about a few hypothesis that if we do well, we will provide a unique value to the users that our team has strength to do well and maintain."
+            }
+        ];
+
+        function createFewShotPrompt(userQuestion, maxExamples = 3) {
+            let prompt = "You are a product management expert. Here are some examples of how to answer questions:\n\n";
+
+            for (let i = 0; i < Math.min(maxExamples, trainingData.length); i++) {
+                const example = trainingData[i];
+                prompt += `Question: ${example.input}\n`;
+                prompt += `Answer: ${example.output}\n\n`;
+            }
+
+            prompt += `Now answer this question:\nQuestion: ${userQuestion}\nAnswer:`;
+            return prompt;
+        }
+
         async function askQuestion() {
             const question = document.getElementById('question').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
             const chatMessages = document.getElementById('chat-messages');
             const askBtn = document.getElementById('askBtn');
-            
+
             if (!question) {
                 return;
             }
-            
+
+            if (!apiKey) {
+                addMessage('❌ Please enter your Fireworks AI API key first.', 'ai');
+                return;
+            }
+
             // Add user message to chat
             addMessage(question, 'user');
-            
+
             // Clear input
             document.getElementById('question').value = '';
-            
+
             // Show loading state
             askBtn.disabled = true;
             askBtn.textContent = 'Thinking...';
-            
+
             // Add loading message
             const loadingId = addLoadingMessage();
-            
+
             try {
-                                            const response = await fetch('/.netlify/functions/ask', {
+                const prompt = createFewShotPrompt(question);
+                
+                const response = await fetch('https://api.fireworks.ai/inference/v1/chat/completions', {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${apiKey}`,
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ question: question })
+                    body: JSON.stringify({
+                        model: "accounts/fireworks/models/llama-v3p1-70b-instruct",
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
                 });
-                
+
                 const data = await response.json();
-                
+
                 // Remove loading message
                 removeLoadingMessage(loadingId);
-                
+
                 if (data.error) {
-                    addMessage(`Error: ${data.error}`, 'ai');
+                    addMessage(`Error: ${data.error.message || data.error}`, 'ai');
+                } else if (data.choices && data.choices[0]) {
+                    addMessage(data.choices[0].message.content, 'ai');
                 } else {
-                    addMessage(data.answer, 'ai');
+                    addMessage('Error: Unexpected response format', 'ai');
                 }
             } catch (error) {
                 removeLoadingMessage(loadingId);
@@ -224,49 +299,49 @@
                 askBtn.textContent = 'Send';
             }
         }
-        
+
         function addMessage(content, type) {
             const chatMessages = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}-message`;
-            
+
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.textContent = content;
-            
+
             messageDiv.appendChild(contentDiv);
             chatMessages.appendChild(messageDiv);
-            
+
             // Scroll to bottom
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
+
         function addLoadingMessage() {
             const chatMessages = document.getElementById('chat-messages');
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message ai-message';
             loadingDiv.id = 'loading-message';
-            
+
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.innerHTML = '<div class="loading">🤔 Thinking...</div>';
-            
+
             loadingDiv.appendChild(contentDiv);
             chatMessages.appendChild(loadingDiv);
-            
+
             // Scroll to bottom
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            
+
             return 'loading-message';
         }
-        
+
         function removeLoadingMessage(loadingId) {
             const loadingElement = document.getElementById(loadingId);
             if (loadingElement) {
                 loadingElement.remove();
             }
         }
-        
+
         // Allow Enter key to submit (without Ctrl)
         document.getElementById('question').addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -274,11 +349,24 @@
                 askQuestion();
             }
         });
-        
+
         // Auto-resize textarea
         document.getElementById('question').addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Load API key from localStorage if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('fireworks_api_key');
+            if (savedApiKey) {
+                document.getElementById('apiKey').value = savedApiKey;
+            }
+        });
+
+        // Save API key to localStorage when changed
+        document.getElementById('apiKey').addEventListener('input', function() {
+            localStorage.setItem('fireworks_api_key', this.value);
         });
     </script>
 </body>
