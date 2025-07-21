@@ -10,7 +10,11 @@ def load_training_data():
     """Load training data for few-shot examples"""
     examples = []
     try:
-        with open('data.JSONL', 'r') as f:
+        # Get the directory where this function is located
+        import os
+        function_dir = os.path.dirname(os.path.abspath(__file__))
+        data_path = os.path.join(function_dir, 'data.JSONL')
+        with open(data_path, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line:
