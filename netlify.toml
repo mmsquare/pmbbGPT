@@ -1,5 +1,9 @@
 [build]
   publish = "public"
+  functions = "functions"
+
+[build.environment]
+  PYTHON_VERSION = "3.9"
 
 [[redirects]]
   from = "/*"
