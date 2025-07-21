@@ -45,6 +45,15 @@ Thumbs.db
 *.pt
 *.pth
 *.bin
-*.safetensors 
+*.safetensors
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Netlify
+.netlify/ 
 # Local Netlify folder
 .netlify
