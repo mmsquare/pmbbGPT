@@ -22,23 +22,24 @@ A chat-based AI assistant for product management questions, powered by Fireworks
 
 ## Local Development
 
-1. Install dependencies:
+For local development, you can use Netlify CLI:
+
+1. Install Netlify CLI:
 ```bash
-pip install flask requests python-dotenv
+npm install -g netlify-cli
 ```
 
 2. Set up environment variables:
 ```bash
-cp env.example .env
-# Edit .env and add your FIREWORKS_API_KEY
+netlify env:set FIREWORKS_API_KEY "your-api-key-here"
 ```
 
 3. Run locally:
 ```bash
-python web_app.py
+netlify dev
 ```
 
-4. Visit: http://localhost:8080
+4. Visit: http://localhost:8888
 
 ## Netlify Deployment
 
@@ -79,11 +80,8 @@ pmbbGPT/
 │   ├── training-data.js    # Training data (JS module)
 │   ├── training-data.json  # Training data (JSON format)
 │   └── package.json        # Function dependencies
-├── templates/
-│   └── index.html          # Flask template (for local development)
 ├── update-training-data.js # Utility to manage training data
 ├── netlify.toml            # Netlify configuration
-├── web_app.py              # Flask app (for local development)
 └── README.md               # Documentation
 ```
 
@@ -126,7 +124,7 @@ node update-training-data.js add "Your question here?" "Your answer here."
 - **Backend**: Netlify Functions (Node.js)
 - **AI**: Fireworks AI LLaMA 3.1 70B
 - **Deployment**: Netlify
-- **Local Development**: Flask
+- **Local Development**: Netlify CLI
 
 ## GitHub Repository
 
