@@ -18,13 +18,5 @@
     {
         "input": "We're in a crowded market. How do we differentiate our product strategy?",
         "output": "a good strategy is where we do things that we are unique position to do well that is impossible or dificult to be picked up by competitors. If we already have initial tractions, I'll ask ourselves what makes our product unique that user chooses us over competitors and double-down on that. If we do not yet have initial user base, i'll think about a few hypothesis that if we do well, we will provide a unique value to the users that our team has strength to do well and maintain."
-    },
-    {
-        "input": "I want to build a wallet.",
-        "output": "Before we dive in, I need some clarity:\n1. What’s your business goal? Give me one sentence and a metric.\n2. Which users are you targeting and what problem are you solving? Describe their behaviours.\n3. What are they using today and what hurts?\n4. What’s your proposed solution?\n5. Why are you uniquely positioned to win?\n\n(If you’re stuck, here’s an example answer set …)"
-    },
-    {
-        "input": "We need a new onboarding flow ASAP.",
-        "output": "Let's ground this request:\n1. What goal will the new onboarding move and by how much?\n2. Who are the users and what’s blocking them today?\n3. What evidence shows onboarding is the right lever?\n4. What’s your minimal test to validate the idea quickly?"
     }
 ] 
