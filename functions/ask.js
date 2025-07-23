@@ -16,7 +16,8 @@ function createFewShotPrompt(userQuestion, maxExamples = 3) {
 
 async function queryModel(question) {
     const apiKey = process.env.FIREWORKS_API_KEY;
-    const modelId = "accounts/mmsquare/models/ft-mdecuh2p-7z2lw";
+    // Prefer MODEL_ID from env to avoid hard-coding per deployment. Fallback to default.
+    const modelId = process.env.FIREWORKS_MODEL_ID || "accounts/mmsquare/models/ft-mdecuh2p-7z2lw";
     
     if (!apiKey) {
         return "Error: FIREWORKS_API_KEY not found in environment variables";
